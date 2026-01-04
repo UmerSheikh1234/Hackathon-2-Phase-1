@@ -56,7 +56,7 @@ export default function HomePage() {
         <h1 className="text-4xl font-bold mb-8">Todo App</h1>
       </div>
 
-      <div className="w-full max-w-5xl">
+      <div className="w-full max_w_5xl">
         <form onSubmit={handleAddTask} className="flex gap-4 mb-8">
           <input
             type="text"

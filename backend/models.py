@@ -8,11 +8,13 @@ class User(SQLModel, table=True):
     name: Optional[str] = None
     created_at: Optional[str] = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat(), nullable=False)
 
-class Task(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: str = Field(index=True, foreign_key="user.id") # Link to User model
-    title: str = Field(nullable=False)
+class TaskBase(SQLModel):
+    title: str
     description: Optional[str] = None
+
+class Task(TaskBase, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: str = Field(index=True) # foreign_key="user.id" - removed for now to simplify until User model is used
     completed: bool = Field(default=False)
     created_at: Optional[str] = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat(), nullable=False)
     updated_at: Optional[str] = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat(), nullable=False)
@@ -26,3 +28,6 @@ class Task(SQLModel, table=True):
                 "completed": False,
             }
         }
+
+class TaskCreate(TaskBase):
+    pass
