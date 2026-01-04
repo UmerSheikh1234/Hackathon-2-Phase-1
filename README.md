@@ -1,4 +1,4 @@
-# Hackathon II: Todo Spec-Driven Development
+# Hackathon-2-Phase-1: Todo Spec-Driven Development
 
 This project implements a Todo application following the specifications of Hackathon II.
 
