@@ -4,7 +4,7 @@
 A todo application that evolves from console app to AI chatbot.
 
 ## Current Phase
-Phase II: Full-Stack Web Application
+Phase III: Todo AI Chatbot
 
 ## Tech Stack
 - Python 3.13+

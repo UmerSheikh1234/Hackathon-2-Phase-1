@@ -6,7 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware # Import CORS
 from dotenv import load_dotenv
 
 from db import engine, create_db_and_tables
-from routes import tasks
+from routes import tasks, chat
+
 
 load_dotenv() # Load environment variables from .env file
 
@@ -32,7 +33,9 @@ app.add_middleware(
     allow_headers=["*"], # Allows all headers
 )
 
-app.include_router(tasks.router, prefix="/api")
+app.include_router(tasks.router, prefix="/api", tags=["Tasks"])
+app.include_router(chat.router, prefix="/api", tags=["Chat"])
+
 
 @app.get("/")
 async def read_root():

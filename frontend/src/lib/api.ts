@@ -68,3 +68,17 @@ export const markTaskComplete = async (taskId: number): Promise<Task> => {
     }
     return response.json();
 };
+
+export const sendChatMessage = async (message: string, conversationId: number | null): Promise<{ response: string; conversation_id: number }> => {
+  const response = await fetch(`${API_URL}/chat/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ message, conversation_id: conversationId }),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to send chat message');
+  }
+  return response.json();
+};

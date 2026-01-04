@@ -3,6 +3,8 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { Task, getTasks, createTask, deleteTask, markTaskComplete } from '@/lib/api';
 
+import Chat from '@/components/Chat'; // Import the new Chat component
+
 export default function HomePage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState('');
@@ -51,12 +53,16 @@ export default function HomePage() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-24 bg-gray-900 text-white">
+    <main className="flex min-h-screen flex-col items-center p-12 bg-gray-900 text-white">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <h1 className="text-4xl font-bold mb-8">Todo App</h1>
+        <h1 className="text-4xl font-bold mb-4">Todo App</h1>
       </div>
+      
+      {/* Render the Chat component */}
+      <Chat />
 
-      <div className="w-full max_w_5xl">
+      <div className="w-full max-w-5xl mt-12">
+        <h2 className="text-2xl font-bold mb-6 border-t border-gray-700 pt-6">Manual Task List</h2>
         <form onSubmit={handleAddTask} className="flex gap-4 mb-8">
           <input
             type="text"
