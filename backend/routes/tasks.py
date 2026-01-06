@@ -2,8 +2,8 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session, select
-from ..db import get_session
-from ..models import Task, TaskCreate
+from db import get_session
+from models import Task, TaskCreate
 
 router = APIRouter()
 

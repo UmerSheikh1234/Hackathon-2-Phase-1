@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from sqlmodel import Session
+from sqlmodel import Session, select
 from ..db import get_session
+from ..models import Conversation, Message, User
+from ..services.ai import get_ai_response # Import the AI response function
 
 class ChatRequest(BaseModel):
     message: str
@@ -15,18 +17,50 @@ router = APIRouter()
 
 @router.post("/chat/", response_model=ChatResponse)
 async def handle_chat(chat_request: ChatRequest, session: Session = Depends(get_session)):
-    # For now, we'll just echo the message back.
-    # In the full implementation, this is where we will:
-    # 1. Load conversation history.
-    # 2. Call the AI agent.
-    # 3. Save the new messages.
-    # 4. Return the AI's response.
+    user_id = "test_user" # Hardcoded user_id for now
+
+    # Ensure user exists (for conversation linking)
+    user = session.exec(select(User).where(User.id == user_id)).first()
+    if not user:
+        user = User(id=user_id, email=f"{user_id}@example.com", name=user_id)
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+
+    # Find or create conversation
+    conversation = None
+    if chat_request.conversation_id:
+        conversation = session.exec(select(Conversation).where(Conversation.id == chat_request.conversation_id, Conversation.user_id == user_id)).first()
     
-    # Dummy logic for now:
-    user_message = chat_request.message
-    conversation_id = chat_request.conversation_id or 1 # Dummy conversation ID
+    if not conversation:
+        conversation = Conversation(user_id=user_id)
+        session.add(conversation)
+        session.commit()
+        session.refresh(conversation)
     
-    # Echo response
-    ai_response = f"You said: '{user_message}'"
-    
-    return ChatResponse(response=ai_response, conversation_id=conversation_id)
+    # Store user message
+    user_message_obj = Message(conversation_id=conversation.id, role="user", content=chat_request.message)
+    session.add(user_message_obj)
+    session.commit()
+    session.refresh(user_message_obj)
+
+    # Get conversation history
+    conversation_messages = session.exec(select(Message).where(Message.conversation_id == conversation.id).order_by(Message.created_at)).all()
+    # Format messages for OpenAI
+    formatted_messages = [{"role": msg.role, "content": msg.content} for msg in conversation_messages]
+
+    # Get AI response
+    ai_response_content = await get_ai_response(
+        user_message=chat_request.message,
+        conversation_messages=formatted_messages,
+        session=session,
+        user_id=user_id # Pass user_id to AI tools
+    )
+
+    # Store AI response
+    ai_message_obj = Message(conversation_id=conversation.id, role="assistant", content=ai_response_content)
+    session.add(ai_message_obj)
+    session.commit()
+    session.refresh(ai_message_obj)
+
+    return ChatResponse(response=ai_response_content, conversation_id=conversation.id)

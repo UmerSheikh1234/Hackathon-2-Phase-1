@@ -22,7 +22,7 @@ app = FastAPI(lifespan=lifespan)
 # Add CORS middleware
 origins = [
     "http://localhost:3000", # The origin for your frontend development server
-    # You can add your Vercel deployment URL here later
+    "https://hackathon-2-phase-1-5eis.vercel.app", # Your Vercel deployment URL
 ]
 
 app.add_middleware(
